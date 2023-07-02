@@ -63,13 +63,14 @@ let loadInocar = (inocar) =>{
             const xml = parser.parseFromString(data, "text/html")
             let contenedorMareas = xml.getElementsByClassName('container-fluid')[0]
             contenedor.innerHTML = contenedorMareas.innerHTML
-            localStorage.setItem("inocar", data)
+            localStorage.setItem("inocar", null)
         })
         .catch(console.error)
     } else{
         const xmlLoaded = parser.parseFromString(inocar, "text/html")
         let contenedorMareas = xmlLoaded.getElementsByClassName('container-fluid')[0]
         contenedor.innerHTML = contenedorMareas.innerHTML
+        localStorage.setItem("inocar", null)
     }
     
 }
