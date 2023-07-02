@@ -51,41 +51,43 @@ let load = (data) => {
     plot(data)
 }
 
-let loadInocar = (inocar) =>{
-    let URL_proxy = 'http://localhost:8080/'
-    let URL = URL_proxy + 'https://www.inocar.mil.ec/mareas/consultan.php' 
+let loadInocar = (inocar) => {
+    let URL_proxy = 'https://cors-anywhere.herokuapp.com/'
+    let URL = URL_proxy + 'https://www.inocar.mil.ec/mareas/consultan.php'
     let contenedor = document.getElementById('table-container')
     const parser = new DOMParser()
-    if(inocar == null){
+    if (inocar == null) {
         fetch(URL)
-        .then(response => response.text())
-        .then(data => {
-            const xml = parser.parseFromString(data, "text/html")
-            let contenedorMareas = xml.getElementsByClassName('container-fluid')[0]
-            contenedor.innerHTML = contenedorMareas.innerHTML
-            localStorage.setItem("inocar", null)
-        })
-        .catch(console.error)
-    } else{
+            .then(response => response.text())
+            .then(data => {
+                const xml = parser.parseFromString(data, "text/html")
+                let contenedorMareas = xml.getElementsByClassName('container-fluid')[0]
+                contenedor.innerHTML = contenedorMareas.innerHTML
+                localStorage.setItem("inocar", data)
+            })
+            .catch(console.error)
+    } else {
         const xmlLoaded = parser.parseFromString(inocar, "text/html")
         let contenedorMareas = xmlLoaded.getElementsByClassName('container-fluid')[0]
         contenedor.innerHTML = contenedorMareas.innerHTML
-        localStorage.setItem("inocar", null)
     }
-    
+
 }
 
-let meteo = localStorage.getItem("meteo");
-let inocar = localStorage.getItem("inocar");
-
 (
-    async function(){
-        if (meteo == null){
-            let weatherProm = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-2.15&longitude=-79.97&hourly=temperature_2m&daily=uv_index_max&current_weather=true&timezone=auto')
-            let weather = await weatherProm.json()
-            load(weather)
-            localStorage.setItem('meteo', JSON.stringify(weather))
-        } else{
+    async function () {
+        let inocar = localStorage.getItem("inocar");
+        let meteo = localStorage.getItem("meteo");
+        if (meteo == null) {
+            try {
+                let weatherProm = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-2.15&longitude=-79.97&hourly=temperature_2m&daily=uv_index_max&current_weather=true&timezone=auto')
+                let weather = await weatherProm.json()
+                load(weather)
+                localStorage.setItem('meteo', JSON.stringify(weather))
+            } catch (error) {
+                console.log(error);
+            }
+        } else {
             load(JSON.parse(meteo))
         }
         loadInocar(inocar)
